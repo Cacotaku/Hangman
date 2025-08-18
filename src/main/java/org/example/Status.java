@@ -1,4 +1,8 @@
 package org.example;
 
-public enum Status {
+public enum Status
+{
+    ONGOING,
+    WIN,
+    LOSS
 }
