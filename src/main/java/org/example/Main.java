@@ -7,16 +7,17 @@ import java.util.ArrayList;
 public class Main
 {
 
-
     public static void main(String[] args)
     {
 
-        ArrayList<Hangman> partida = new ArrayList<>();
-        JogoHangman sequenciaDePartidas = new JogoHangman(partida);
+         // cria o controlador do jogo
+        JogoHangman jogo = new JogoHangman();
 
-        System.out.printf(sequenciaDePartidas.NovaEstrutura());
+        // inicia uma partida (lê palavra, loop de tentativas etc)
+        jogo.iniciarPartida();
 
-
+        // fecha recursos ao final
+        jogo.fechar();
 
     }
 }

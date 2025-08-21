@@ -1,102 +1,54 @@
 package org.example;
 
-import java.util.Scanner;
 
 public class Boneco
 {
+    public static final int MAX_ERROS = 6;
+    private int erros;
+    private final String head;
+    private final String body;
+    private final String legs;
 
+    public Boneco(String head, String body, String legs) {
+        this.head  = head;
+        this.body  = body;
+        this.legs  = legs;
+        this.erros = 0;
+    }
 
-    private String head;
-    private String upperBody;
-    private String lowerBody;
-    private Scanner scanner;
+    public void desenharProximaParte() {
+        erros++;
+    }
 
-    public Boneco(String head, String upperBody, String lowerBody)
+    @Override
+    public String toString()
     {
-        this.lowerBody = lowerBody;
-        this.head = head;
-        this.upperBody = upperBody;
-        this.scanner = new Scanner(System.in);
-    }
+        // exemplo simples de desenho ASCII baseado no número de erros
+        // line 1: head
+        String line1 = erros >= 1 ? "  O  " : "     ";
 
-    public String getHead() {
-        return head;
-    }
-
-    public void setHead(String head) {
-        this.head = head;
-    }
-
-    public String getUpperBody() {
-        return upperBody;
-    }
-
-    public void setUpperBody(String upperBody) {
-        this.upperBody = upperBody;
-    }
-
-    public String getLowerBody() {
-        return lowerBody;
-    }
-
-    public void setLowerBody(String lowerBody) {
-        this.lowerBody = lowerBody;
-    }
-
-    public Boneco NovoBoneco()
-    {
-        String head = "   ";
-        String upperBody = "   ";
-        String legs = "   ";
-
-        return new Boneco (head, upperBody, legs);
-
-    }
-
-
-
-
-
-    public Boneco Desenho(int numeroDeErros)
-    {
-        Boneco boneco = new Boneco(head, upperBody, lowerBody);
-
-        if(numeroDeErros == 0)
-        {
-            return boneco;
-        }
-        else if(numeroDeErros >= 1)
-        {
-            head = " o ";
-
-            //Verificar parte de cima do corpo
-            if(numeroDeErros >= 2)
-            {
-                upperBody = " | ";
-
-            }else if(numeroDeErros == 3)
-            {
-                upperBody = "/| ";
-
-            }else if(numeroDeErros == 4)
-            {
-                upperBody = "/|\\";
-            }
-
-            //Verificar parte de baixo do corpo
-            if(numeroDeErros >= 5)
-            {
-                lowerBody = "/  ";
-
-            }else if (numeroDeErros >= 6)
-            {
-                lowerBody = "/ \\";
-            }
-
+        // line 2: torso + arms
+        String line2;
+        if (erros >= 4) {
+            line2 = " /|\\ ";
+        } else if (erros == 3) {
+            line2 = " /|  ";
+        } else if (erros == 2) {
+            line2 = "  |  ";
+        } else {
+            line2 = "     ";
         }
 
-        return new Boneco(head, upperBody, lowerBody);
+        // line 3: legs
+        String line3;
+        if (erros >= 6) {
+            line3 = " / \\ ";
+        } else if (erros == 5) {
+            line3 = " /   ";
+        } else {
+            line3 = "     ";
+        }
 
-
+        return line1 + "\n" + line2 + "\n" + line3;
     }
 }

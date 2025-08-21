@@ -1,64 +1,121 @@
 package org.example;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+import java.time.LocalDateTime;
 
 public class JogoHangman
 {
-    private ArrayList<Hangman> jogo;
-    private Scanner scanner;
+    private Hangman jogoAtual;
+    private final Scanner scanner;
     private Status status;
-    private ArrayList<String> boneco;
+    private Boneco boneco;
+    private final List<RegistroPartida> historico;
 
-    public JogoHangman(ArrayList<Hangman> jogo)
+    public JogoHangman()
     {
-        this.jogo = jogo;
+        this.historico = new ArrayList<>();
         this.scanner = new Scanner(System.in);
     }
 
-    public void novoJogo()
+    /**
+     * Inicia uma nova partida:
+     * 1. Lê a palavra secreta
+     * 2. Cria Hangman e Boneco
+     * 3. Sinaliza status como ONGOING e armazena no histórico
+     * 4. Entra no loopDeJogo()
+     */
+    public void iniciarPartida()
     {
-        System.out.println("Digite a nova palavra: \n");
-        String palavra = scanner.nextLine();
+         // 1. Leitura da palavra escolhida
+        System.out.print("Digite a palavra secreta: ");
+        String palavra = scanner.nextLine().trim().toUpperCase();
 
+        // 2. Configuração do modelo de jogo e do boneco
+        this.jogoAtual  = new Hangman();
+        this.jogoAtual.setPalavra(palavra);
 
+        this.boneco = new Boneco("   ", "   ", "   ");
+
+        // 3. Inicialização de status
+        this.status    = Status.ONGOING;
+
+        // 4. Inicia o loop de leitura de tentativas
+        loopDeJogo();
     }
 
-    public ArrayList<String> ArranjoDaPalavra(String palavra)
+    public void loopDeJogo()
     {
-        ArrayList<String> organizacao = new ArrayList<>();
-
-        int tamanho = palavra.length();
-
-        for(int i = 0; i < tamanho; i++)
+        while (status == Status.ONGOING)
         {
-            organizacao.add(String.valueOf(palavra.charAt(i)));
+            atualizarStatus();
+            System.out.print("Digite uma letra: ");
+            String tentativa = scanner.nextLine().trim().toUpperCase();
+
+            if (tentativa.isEmpty())
+            {
+                System.out.println("Nenhuma letra informada. Tente novamente.");
+                continue;
+            }
+
+            char letra = tentativa.charAt(0);
+            boolean acertou = jogoAtual.tentar(letra);
+
+            if (!acertou)
+            {
+                boneco.desenharProximaParte();
+            }
+
+            if (jogoAtual.isVencido())
+            {
+                status = Status.WON;
+
+            } else if (jogoAtual.isPerdido())
+            {
+                status = Status.LOST;
+            }
         }
-        return organizacao ;
+
+        atualizarStatus();
+        System.out.println(status == Status.WON ? "Você venceu!" : "Você perdeu!");
+        registrarPartida();
+
     }
 
-    public ArrayList<String> EstaInvisivel(String palavra)
+    /**
+     * Exibe o estado atual da palavra e do boneco
+     */
+    private void atualizarStatus()
     {
-        ArrayList<String> organizacao = new ArrayList<>();
 
-        int tamanho = palavra.length();
+        System.out.println("\nPalavra: " + jogoAtual.getEstado());
+        System.out.println(boneco);
+        System.out.println("Erros: " + jogoAtual.getErroCount() +
+                           " / " + Boneco.MAX_ERROS);
 
-        for(int i = 0; i < tamanho; i++)
-        {
-            organizacao.add(String.valueOf(palavra.charAt(i)));
-        }
-        return organizacao ;
     }
 
-    public String NovaEstrutura()
+
+    private void registrarPartida()
     {
-        return " " + "\n" +
-               " ======= " + "\n" +
-               " |     |" + "\n" +
-               " |    " + "\n" +
-               " |    " + "\n" +
-               " |    " + "\n" +
-               " |" + "\n" +
-               " |\n" ;
+        boolean venceu = (status == Status.WON);
+        int erros      = jogoAtual.getErroCount();
+        String palavra = jogoAtual.getPalavra();
+
+        RegistroPartida registro = new RegistroPartida(
+            palavra,
+            venceu,
+            erros,
+            LocalDateTime.now()
+        );
+        historico.add(registro);
+
     }
+
+    public void fechar()
+    {
+        scanner.close();
+    }
+
 }
